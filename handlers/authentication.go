@@ -58,7 +58,7 @@ func HandleValidateOTP(c *gin.Context, sp *supabaseSdk.Client) {
 	var validateOTPRequestBody types.ValidateOTPRequestBody
 	c.BindJSON(&validateOTPRequestBody)
 	res, error := sp.Auth.VerifyForUser(gotrueTypes.VerifyForUserRequest{
-		Type:       "magiclink",
+		Type:       "signup",
 		Token:      validateOTPRequestBody.Code,
 		Email:      validateOTPRequestBody.Email,
 		RedirectTo: "http://localhost:3000",
