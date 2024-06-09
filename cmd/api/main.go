@@ -27,6 +27,18 @@ func InitializeAPI() {
 		handlers.HandleLogin(c, sp)
 	})
 
+	r.POST("/register", func(c *gin.Context) {
+		handlers.HandleSignUp(c, sp)
+	})
+
+	r.POST("/signup/link", func(c *gin.Context) {
+		handlers.HandleMagicLink(c, sp)
+	})
+
+	r.POST("/validate/link", func(c *gin.Context) {
+		handlers.HandleValidateOTP(c, sp)
+	})
+
 	r.Run(":3000")
 	log.Println("Running server on port 3000...")
 }
