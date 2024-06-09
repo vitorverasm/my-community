@@ -24,7 +24,7 @@ func InitializeAPI() {
 	})
 
 	r.POST("/login", func(c *gin.Context) {
-		handlers.HandleLoginWithSupabase(c, sp)
+		handlers.HandleLogin(c, sp)
 	})
 
 	r.Run(":3000")

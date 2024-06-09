@@ -8,10 +8,9 @@ import (
 	"github.com/vitorverasm/my-community/types"
 )
 
-func HandleLoginWithSupabase(c *gin.Context, sp *supabaseSdk.Client) {
+func HandleLogin(c *gin.Context, sp *supabaseSdk.Client) {
 	var loginRequestBody types.LoginRequestBody
 	c.BindJSON(&loginRequestBody)
-
 	token, error := sp.Auth.SignInWithEmailPassword(loginRequestBody.Email, loginRequestBody.Password)
 
 	if error != nil {
