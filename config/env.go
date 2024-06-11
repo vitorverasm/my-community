@@ -16,14 +16,30 @@ func LoadEnvVariables() types.ApplicationEnv {
 
 	supabaseUrl := os.Getenv("SUPABASE_URL")
 	supabaseApiKey := os.Getenv("SUPABASE_API_KEY")
+	streamApiKey := os.Getenv("STREAM_API_KEY")
+	streamApiSecret := os.Getenv("STREAM_API_SECRET")
 
-	if supabaseUrl == "" || supabaseApiKey == "" {
-		log.Fatal("SUPABASE_URL or SUPABASE_API_KEY not found in .env file")
+	if supabaseUrl == "" {
+		log.Fatal("SUPABASE_URL not found in .env file")
+	}
+
+	if supabaseApiKey == "" {
+		log.Fatal("SUPABASE_API_KEY not found in .env file")
+	}
+
+	if streamApiKey == "" {
+		log.Fatal("STREAM_API_KEY not found in .env file")
+	}
+
+	if streamApiSecret == "" {
+		log.Fatal("STREAM_API_SECRET not found in .env file")
 	}
 
 	env := types.ApplicationEnv{
-		SupabaseUrl:    supabaseUrl,
-		SupabaseApiKey: supabaseApiKey,
+		SupabaseUrl:     supabaseUrl,
+		SupabaseApiKey:  supabaseApiKey,
+		StreamApiKey:    streamApiKey,
+		StreamApiSecret: streamApiSecret,
 	}
 
 	return env
