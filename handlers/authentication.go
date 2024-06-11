@@ -6,68 +6,54 @@ import (
 	"github.com/gin-gonic/gin"
 	gotrueTypes "github.com/supabase-community/gotrue-go/types"
 	supabaseSdk "github.com/supabase-community/supabase-go"
+	"github.com/vitorverasm/my-community/pkg/stream"
 	"github.com/vitorverasm/my-community/types"
 )
 
 func HandleLogin(c *gin.Context, sp *supabaseSdk.Client) {
 	var loginRequestBody types.LoginRequestBody
 	c.BindJSON(&loginRequestBody)
-	token, error := sp.Auth.SignInWithEmailPassword(loginRequestBody.Email, loginRequestBody.Password)
+	token, signInError := sp.Auth.SignInWithEmailPassword(loginRequestBody.Email, loginRequestBody.Password)
 
-	if error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": error.Error()})
+	authorizedClient := sp.Auth.WithToken(
+		token.AccessToken,
+	)
+
+	user, getUserError := authorizedClient.GetUser()
+
+	if getUserError != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": getUserError.Error(), "msg": "Failed to get user information"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"email": loginRequestBody.Email, "token": token.AccessToken})
+	if signInError != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": signInError.Error(), "msg": "Login failed"})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"email": loginRequestBody.Email, "token": token.AccessToken, "streamToken": user.UserMetadata["streamToken"].(string)})
 }
 
 func HandleSignUp(c *gin.Context, sp *supabaseSdk.Client) {
 	var signUpRequestBody types.SignUpRequestBody
 	c.BindJSON(&signUpRequestBody)
+	token, err := stream.GetToken(signUpRequestBody.Email)
+
+	if err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error(), "msg": "Failed to create token for user"})
+	}
 
 	res, error := sp.Auth.Signup(gotrueTypes.SignupRequest{
 		Email:    signUpRequestBody.Email,
 		Password: signUpRequestBody.Password,
+		Data: map[string]interface{}{
+			"streamToken": token,
+		},
 	})
 	if error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": error.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": error.Error(), "msg": "Failed to create user"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"email": res.User.Email, "token": res.AccessToken, "email_confirmed_at": res.User.EmailConfirmedAt})
-}
-
-func HandleMagicLink(c *gin.Context, sp *supabaseSdk.Client) {
-	var magicLinkRequestBody types.MagicLinkRequestBody
-	c.BindJSON(&magicLinkRequestBody)
-	error := sp.Auth.OTP(gotrueTypes.OTPRequest{
-		Email:      magicLinkRequestBody.Email,
-		CreateUser: true,
-	})
-
-	if error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": error.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"email": magicLinkRequestBody.Email, "message": "Sign up link sent to E-mail"})
-}
-
-func HandleValidateOTP(c *gin.Context, sp *supabaseSdk.Client) {
-	var validateOTPRequestBody types.ValidateOTPRequestBody
-	c.BindJSON(&validateOTPRequestBody)
-	res, error := sp.Auth.VerifyForUser(gotrueTypes.VerifyForUserRequest{
-		Type:       "signup",
-		Token:      validateOTPRequestBody.Code,
-		Email:      validateOTPRequestBody.Email,
-		RedirectTo: "http://localhost:3000",
-	})
-
-	if error != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": error.Error()})
-		return
-	}
-
-	c.JSON(http.StatusOK, gin.H{"email": res.User.Email, "token": res.AccessToken})
+	c.JSON(http.StatusOK, gin.H{"email": res.User.Email, "streamToken": token})
 }
