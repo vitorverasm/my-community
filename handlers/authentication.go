@@ -55,5 +55,5 @@ func HandleSignUp(c *gin.Context, sp *supabaseSdk.Client) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"email": res.User.Email, "streamToken": token})
+	c.JSON(http.StatusOK, gin.H{"email": res.User.Email, "streamToken": token, "msg": "Email confirmation was sent to your email address"})
 }
