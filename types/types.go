@@ -11,24 +11,24 @@ type SignUpRequestBody struct {
 }
 
 type User struct {
-	Email            string `json:"email"`
-	InteractionToken string `json:"interactionToken"`
-	AccessToken      string `json:"token"`
+	Email              string `json:"email"`
+	CommunicationToken string `json:"communicationToken"`
+	AccessToken        string `json:"token"`
 }
 
 type UnverifiedUser struct {
-	Email            string
-	InteractionToken string
+	Email              string `json:"email"`
+	CommunicationToken string `json:"communicationToken"`
 }
 
 type AuthProvider interface {
 	SignInWithEmailPassword(email string, password string) (accessToken string, err error)
 	GetUserInfo(accessToken string) (User, error)
-	SignUp(email string, password string, interactionToken string) (UnverifiedUser, error)
+	SignUp(email string, password string, communicationToken string) (UnverifiedUser, error)
 }
 
 type CommunicationProvider interface {
-	GetUserInteractionToken(userEmail string) (userInteractionToken string, err error)
+	GetUserCommunicationToken(userEmail string) (communicationToken string, err error)
 }
 
 type ApplicationEnv struct {

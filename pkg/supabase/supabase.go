@@ -42,28 +42,28 @@ func (sup *SupabaseAuthProvider) GetUserInfo(accessToken string) (types.User, er
 		return types.User{}, getUserError
 	}
 
-	interactionToken, ok := user.UserMetadata["interactionToken"].(string)
+	communicationToken, ok := user.UserMetadata["communicationToken"].(string)
 	if !ok {
 		return types.User{
-			Email:            user.Email,
-			AccessToken:      accessToken,
-			InteractionToken: "",
+			Email:              user.Email,
+			AccessToken:        accessToken,
+			CommunicationToken: "",
 		}, nil
 	}
 
 	return types.User{
-		Email:            user.Email,
-		AccessToken:      accessToken,
-		InteractionToken: interactionToken,
+		Email:              user.Email,
+		AccessToken:        accessToken,
+		CommunicationToken: communicationToken,
 	}, nil
 }
 
-func (sup *SupabaseAuthProvider) SignUp(email string, password string, interactionToken string) (types.UnverifiedUser, error) {
+func (sup *SupabaseAuthProvider) SignUp(email string, password string, communicationToken string) (types.UnverifiedUser, error) {
 	res, error := sup.Client.Auth.Signup(gotrueTypes.SignupRequest{
 		Email:    email,
 		Password: password,
 		Data: map[string]interface{}{
-			"interactionToken": interactionToken,
+			"communicationToken": communicationToken,
 		},
 	})
 
@@ -72,7 +72,7 @@ func (sup *SupabaseAuthProvider) SignUp(email string, password string, interacti
 	}
 
 	return types.UnverifiedUser{
-		Email:            res.Email,
-		InteractionToken: interactionToken,
+		Email:              res.Email,
+		CommunicationToken: communicationToken,
 	}, nil
 }

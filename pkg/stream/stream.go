@@ -20,7 +20,7 @@ type StreamCommunicationProvider struct {
 	Client *streamSDK.Client
 }
 
-func (stream *StreamCommunicationProvider) GetUserInteractionToken(userEmail string) (userInteractionToken string, err error) {
+func (stream *StreamCommunicationProvider) GetUserCommunicationToken(userEmail string) (userCommunicationToken string, err error) {
 	token, error := stream.Client.CreateToken(userEmail, time.Time{})
 
 	if error != nil {

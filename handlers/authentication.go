@@ -36,24 +36,24 @@ func handleLogin(c *gin.Context, ap types.AuthProvider) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"email": user.Email, "token": user.AccessToken, "interactionToken": user.InteractionToken})
+	c.JSON(http.StatusOK, gin.H{"email": user.Email, "token": user.AccessToken, "communicationToken": user.CommunicationToken})
 }
 
 func handleSignUp(c *gin.Context, ap types.AuthProvider, cp types.CommunicationProvider) {
 	var signUpRequestBody types.SignUpRequestBody
 	c.BindJSON(&signUpRequestBody)
-	interactionToken, createInteractionTokenError := cp.GetUserInteractionToken(signUpRequestBody.Email)
+	communicationToken, createCommunicationTokenError := cp.GetUserCommunicationToken(signUpRequestBody.Email)
 
-	if createInteractionTokenError != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": createInteractionTokenError.Error(), "msg": "Failed to create token for user"})
+	if createCommunicationTokenError != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": createCommunicationTokenError.Error(), "msg": "Failed to create token for user"})
 	}
 
-	unverifiedUser, signUpError := ap.SignUp(signUpRequestBody.Email, signUpRequestBody.Password, interactionToken)
+	unverifiedUser, signUpError := ap.SignUp(signUpRequestBody.Email, signUpRequestBody.Password, communicationToken)
 
 	if signUpError != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": signUpError.Error(), "msg": "Failed to create user"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"email": unverifiedUser.Email, "interactionToken": unverifiedUser.InteractionToken, "msg": "Email confirmation was sent to your email address"})
+	c.JSON(http.StatusOK, gin.H{"email": unverifiedUser.Email, "communicationToken": unverifiedUser.CommunicationToken, "msg": "Email confirmation was sent to your email address"})
 }
