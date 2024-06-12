@@ -22,7 +22,7 @@ func main() {
 	r := gin.Default()
 
 	supabaseAuthProvider := &supabase.SupabaseAuthProvider{
-		Client: supabase.InitializeClient(env.SupabaseUrl, env.StreamApiKey),
+		Client: supabase.InitializeClient(env.SupabaseUrl, env.SupabaseApiKey),
 	}
 
 	streamCommunicationProvider := &stream.StreamCommunicationProvider{
