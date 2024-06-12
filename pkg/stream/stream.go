@@ -5,12 +5,10 @@ import (
 	"time"
 
 	streamSDK "github.com/GetStream/stream-chat-go/v5"
-	"github.com/vitorverasm/my-community/config"
 )
 
-func InitializeClient() *streamSDK.Client {
-	env := config.LoadEnvVariables()
-	client, err := streamSDK.NewClient(env.StreamApiKey, env.StreamApiSecret)
+func InitializeClient(apiKey string, apiSecret string) *streamSDK.Client {
+	client, err := streamSDK.NewClient(apiKey, apiSecret)
 	if err != nil {
 		log.Println("cannot initialize stream client", err)
 	}

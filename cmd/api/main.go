@@ -22,11 +22,11 @@ func main() {
 	r := gin.Default()
 
 	supabaseAuthProvider := &supabase.SupabaseAuthProvider{
-		Client: supabase.InitializeClient(),
+		Client: supabase.InitializeClient(env.SupabaseUrl, env.StreamApiKey),
 	}
 
 	streamCommunicationProvider := &stream.StreamCommunicationProvider{
-		Client: stream.InitializeClient(),
+		Client: stream.InitializeClient(env.StreamApiKey, env.StreamApiSecret),
 	}
 
 	r.POST("/login", func(c *gin.Context) {

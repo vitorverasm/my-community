@@ -5,13 +5,11 @@ import (
 
 	gotrueTypes "github.com/supabase-community/gotrue-go/types"
 	"github.com/supabase-community/supabase-go"
-	"github.com/vitorverasm/my-community/config"
 	"github.com/vitorverasm/my-community/types"
 )
 
-func InitializeClient() *supabase.Client {
-	env := config.LoadEnvVariables()
-	client, err := supabase.NewClient(env.SupabaseUrl, env.SupabaseApiKey, nil)
+func InitializeClient(url string, apiKey string) *supabase.Client {
+	client, err := supabase.NewClient(url, apiKey, nil)
 	if err != nil {
 		log.Println("cannot initialize supabase client", err)
 	}
