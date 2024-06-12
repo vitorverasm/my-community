@@ -20,6 +20,7 @@ type ValidateOTPRequestBody struct {
 }
 
 type ApplicationEnv struct {
+	Environment     string
 	SupabaseUrl     string
 	SupabaseApiKey  string
 	StreamApiKey    string

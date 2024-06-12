@@ -15,6 +15,11 @@ func HandleLogin(c *gin.Context, sp *supabaseSdk.Client) {
 	c.BindJSON(&loginRequestBody)
 	token, signInError := sp.Auth.SignInWithEmailPassword(loginRequestBody.Email, loginRequestBody.Password)
 
+	if signInError != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": signInError.Error(), "msg": "Login failed - Invalid credentials"})
+		return
+	}
+
 	authorizedClient := sp.Auth.WithToken(
 		token.AccessToken,
 	)
@@ -23,11 +28,6 @@ func HandleLogin(c *gin.Context, sp *supabaseSdk.Client) {
 
 	if getUserError != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": getUserError.Error(), "msg": "Failed to get user information"})
-		return
-	}
-
-	if signInError != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": signInError.Error(), "msg": "Login failed"})
 		return
 	}
 

@@ -14,6 +14,7 @@ func LoadEnvVariables() types.ApplicationEnv {
 		log.Fatal("Error loading .env file")
 	}
 
+	environment := os.Getenv("APP_ENV")
 	supabaseUrl := os.Getenv("SUPABASE_URL")
 	supabaseApiKey := os.Getenv("SUPABASE_API_KEY")
 	streamApiKey := os.Getenv("STREAM_API_KEY")
@@ -35,7 +36,12 @@ func LoadEnvVariables() types.ApplicationEnv {
 		log.Fatal("STREAM_API_SECRET not found in .env file")
 	}
 
+	if environment == "" {
+		log.Fatal("APP_ENV not found in .env file")
+	}
+
 	env := types.ApplicationEnv{
+		Environment:     environment,
 		SupabaseUrl:     supabaseUrl,
 		SupabaseApiKey:  supabaseApiKey,
 		StreamApiKey:    streamApiKey,
