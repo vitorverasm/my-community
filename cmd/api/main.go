@@ -10,14 +10,7 @@ import (
 	"github.com/vitorverasm/my-community/pkg/supabase"
 )
 
-var supabaseClient = supabase.InitializeClient()
-var streamClient = stream.InitializeClient()
-
 func main() {
-	InitializeAPI()
-}
-
-func InitializeAPI() {
 	env := config.LoadEnvVariables()
 
 	if env.Environment == "release" {
@@ -29,11 +22,11 @@ func InitializeAPI() {
 	r := gin.Default()
 
 	supabaseAuthProvider := &supabase.SupabaseAuthProvider{
-		Client: supabaseClient,
+		Client: supabase.InitializeClient(),
 	}
 
 	streamCommunicationProvider := &stream.StreamCommunicationProvider{
-		Client: streamClient,
+		Client: stream.InitializeClient(),
 	}
 
 	r.POST("/login", func(c *gin.Context) {
