@@ -6,10 +6,12 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/vitorverasm/my-community/config"
 	"github.com/vitorverasm/my-community/handlers"
+	"github.com/vitorverasm/my-community/pkg/stream"
 	"github.com/vitorverasm/my-community/pkg/supabase"
 )
 
-var sp = supabase.InitializeClient()
+var supabaseClient = supabase.InitializeClient()
+var streamClient = stream.InitializeClient()
 
 func main() {
 	InitializeAPI()
@@ -26,15 +28,20 @@ func InitializeAPI() {
 
 	r := gin.Default()
 
+	supabaseAuthProvider := &supabase.SupabaseAuthProvider{
+		Client: supabaseClient,
+	}
+
+	streamCommunicationProvider := &stream.StreamCommunicationProvider{
+		Client: streamClient,
+	}
+
 	r.POST("/login", func(c *gin.Context) {
-		supabaseAuthProvider := &supabase.SupabaseAuthProvider{
-			Client: sp,
-		}
 		handlers.NewLoginHandler(supabaseAuthProvider)(c)
 	})
 
 	r.POST("/register", func(c *gin.Context) {
-		handlers.HandleSignUp(c, sp)
+		handlers.NewSignUpHandler(supabaseAuthProvider, streamCommunicationProvider)(c)
 	})
 
 	r.Run(":3000")

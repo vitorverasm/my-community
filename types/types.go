@@ -10,15 +10,6 @@ type SignUpRequestBody struct {
 	Password string `json:"password"`
 }
 
-type MagicLinkRequestBody struct {
-	Email string `json:"email"`
-}
-
-type ValidateOTPRequestBody struct {
-	Email string `json:"email"`
-	Code  string `json:"code"`
-}
-
 type User struct {
 	Email            string `json:"email"`
 	InteractionToken string `json:"interactionToken"`
@@ -34,6 +25,10 @@ type AuthProvider interface {
 	SignInWithEmailPassword(email string, password string) (accessToken string, err error)
 	GetUserInfo(accessToken string) (User, error)
 	SignUp(email string, password string, interactionToken string) (UnverifiedUser, error)
+}
+
+type CommunicationProvider interface {
+	GetUserInteractionToken(userEmail string) (userInteractionToken string, err error)
 }
 
 type ApplicationEnv struct {
