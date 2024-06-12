@@ -19,6 +19,23 @@ type ValidateOTPRequestBody struct {
 	Code  string `json:"code"`
 }
 
+type User struct {
+	Email            string `json:"email"`
+	InteractionToken string `json:"interactionToken"`
+	AccessToken      string `json:"token"`
+}
+
+type UnverifiedUser struct {
+	Email            string
+	InteractionToken string
+}
+
+type AuthProvider interface {
+	SignInWithEmailPassword(email string, password string) (accessToken string, err error)
+	GetUserInfo(accessToken string) (User, error)
+	SignUp(email string, password string, interactionToken string) (UnverifiedUser, error)
+}
+
 type ApplicationEnv struct {
 	Environment     string
 	SupabaseUrl     string

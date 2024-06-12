@@ -27,7 +27,10 @@ func InitializeAPI() {
 	r := gin.Default()
 
 	r.POST("/login", func(c *gin.Context) {
-		handlers.HandleLogin(c, sp)
+		supabaseAuthProvider := &supabase.SupabaseAuthProvider{
+			Client: sp,
+		}
+		handlers.NewLoginHandler(supabaseAuthProvider)(c)
 	})
 
 	r.POST("/register", func(c *gin.Context) {

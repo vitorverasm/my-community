@@ -10,28 +10,30 @@ import (
 	"github.com/vitorverasm/my-community/types"
 )
 
-func HandleLogin(c *gin.Context, sp *supabaseSdk.Client) {
+func NewLoginHandler(ap types.AuthProvider) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		HandleLogin(c, ap)
+	}
+}
+
+func HandleLogin(c *gin.Context, ap types.AuthProvider) {
 	var loginRequestBody types.LoginRequestBody
 	c.BindJSON(&loginRequestBody)
-	token, signInError := sp.Auth.SignInWithEmailPassword(loginRequestBody.Email, loginRequestBody.Password)
+	accessToken, authError := ap.SignInWithEmailPassword(loginRequestBody.Email, loginRequestBody.Password)
 
-	if signInError != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": signInError.Error(), "msg": "Login failed - Invalid credentials"})
+	if authError != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": authError.Error(), "msg": "Login failed - Invalid credentials"})
 		return
 	}
 
-	authorizedClient := sp.Auth.WithToken(
-		token.AccessToken,
-	)
+	user, getUserInfoError := ap.GetUserInfo(accessToken)
 
-	user, getUserError := authorizedClient.GetUser()
-
-	if getUserError != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": getUserError.Error(), "msg": "Failed to get user information"})
+	if getUserInfoError != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"error": getUserInfoError.Error(), "msg": "Failed to get user information"})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"email": loginRequestBody.Email, "token": token.AccessToken, "streamToken": user.UserMetadata["streamToken"].(string)})
+	c.JSON(http.StatusOK, gin.H{"email": user.Email, "token": user.AccessToken, "interactionToken": user.InteractionToken})
 }
 
 func HandleSignUp(c *gin.Context, sp *supabaseSdk.Client) {
