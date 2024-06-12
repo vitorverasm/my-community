@@ -30,7 +30,7 @@ func (sup *SupabaseAuthProvider) SignInWithEmailPassword(email string, password 
 		return "", signInError
 	}
 
-	return token.AccessToken, signInError
+	return token.AccessToken, nil
 }
 
 func (sup *SupabaseAuthProvider) GetUserInfo(accessToken string) (types.User, error) {
@@ -50,14 +50,14 @@ func (sup *SupabaseAuthProvider) GetUserInfo(accessToken string) (types.User, er
 			Email:            user.Email,
 			AccessToken:      accessToken,
 			InteractionToken: "",
-		}, getUserError
+		}, nil
 	}
 
 	return types.User{
 		Email:            user.Email,
 		AccessToken:      accessToken,
 		InteractionToken: interactionToken,
-	}, getUserError
+	}, nil
 }
 
 func (sup *SupabaseAuthProvider) SignUp(email string, password string, interactionToken string) (types.UnverifiedUser, error) {
@@ -76,5 +76,5 @@ func (sup *SupabaseAuthProvider) SignUp(email string, password string, interacti
 	return types.UnverifiedUser{
 		Email:            res.Email,
 		InteractionToken: interactionToken,
-	}, error
+	}, nil
 }
